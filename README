@@ -1,0 +1,147 @@
+NUME: BRINZAN IONUT
+GRUPA: 324CD
+
+README
+
+Pentru realizarea acestei teme am implementat interfetele date si am dat run la
+evaluator.
+
+Interfetele au fost implementate astfel:
+
+-IServer a fost implementata de clasa Server.
+-IToken a fost implementata de clasa Token.
+-IBracket a fost implementata de clasa Bracket.
+-IBracketsFactory a fost implementata de clasa BracketsFactory.
+-IOperand a fost implementata de clasa Operand.
+-IOperandsFactory a fost implementata de clasa OperandsFactory.
+-IOperatorsFactory a fost implementata de clasa OperatorsFactory.
+-IOperator este extinsa de interfetele IBinaryOperator, IUnaryOperator care au
+ fost implementate astfel:
+	-IBinaryOperator a fost implementata de clasele: PlusOperator, 
+	MinusOperator, MultiplyOperator, DivideOperator, PowOperator.	 
+    -IUnaryOperator a fost implementata de clasele: SqrtOperator, LogOperator.
+
+In implementarea acestei teme au fost respectate toate design pattern-urile 
+cerute.
+
+Clasa Server este creierul programului, aceasta contine implemenentarea
+Singleton dar si urmatoarele metode:
+
+Metoda canPublish care verifica daca toti operatorii din comanda primita sunt
+OK.(adica se afla in lista validOperators).
+
+Metoda publish este folosita de catre pattern-ul Observer, aceasta are rolul
+de a notifica serverul de noua/noul comanda/calcul.Metoda verifica daca
+Serverul, poate "anunta" cu metoda canPublish. In continuare metoda foloseste 
+2 vectori.Vectorul tokensBuffer este folosit pentru a retine fiecare token din
+comanda intr-un obiect Token.Acest nou vector este dupa folosit pentru a crea
+un nou vector infixForm care este tot un vector de Tokeni dar de aceasta data
+cand creez noile obiecte din vector o sa creez:Bracket,Operator sau Operand
+in functie de caz cu ajutorul celor 3 instante factory(pentru cele 3 factory
+din program am folosit Singleton Pattern).Odata creat vectorul de Tokeni ce 
+contine operatori,paranteze,operanzi tot ce mai ramane de facut este calculul
+efectiv.Folosesc metoda prefixForm pentru a transforma vectorul ce retine 
+forma infixata intr-o forma prefixata dupa care folosesc metoda 
+calculateResult pentru a calcula rezultatul ,rezultat prin care il trec prin
+niste verificari si pe care o sa-l transform in forma romana cu ajutorul
+metodei convertToRomanNumber din OperandsFactory.Dupa ce am rezultatul in
+forma romana tot ce mai ramane de facut este sa-l adaug in lista de rezultate
+adica lista results.
+
+Metoda postfixForm este folosita pentru a transforma vectorul de tokeni care 
+reprezinta forma infixata in forma prefixata.Pentru a face acest lucru 
+folosesc pseudocodul oferit de voi.Stack-ul myStack este asa cum a-ti dorit:
+este privata, se afla in cadrul clasei Server si foloseste elemente de tip 
+IToken.Pe scurt metoda verifica daca elementele sunt: operatori,paranteze sau
+operanzi.Daca ne aflam in cazul in care token-ul este operand doar il adaugam
+la forma postfixata.Daca acesta este paranteza avem 2 cazuri:
+-daca este paranteza deschisa doar adaugam in myStack token-ul respectiv
+-daca este paranteza inchisa cat timp varful stivei nu e Bracket(paranteza)
+sau nu am gasit o pereche de paranteze adaug in forma postfixata dupa care 
+cand gasesc perechea dau pop la aceasta din stiva.
+Daca este operator atunci cat timp stack-ul nu este empty si cat timp varful
+stivei nu este operator si cat timp prioritatea token-ului este mai mica
+decat cea a operatorului din stiva fac pop din stiva in forma postfixata.La 
+final golosesc stiva si adaug elementele la care am dat pop in forma
+postfixata.
+
+Metoda calculateResult are rolul de a calcula rezultatul formei postfixate.
+Pentru a face acest lucru folosesc pseudocodul dat de voi.Procedez asemanator
+ca la metoda anterioara.Cat timp nu am parcurs toata lista de elemente din 
+forma postfixata in cazul in care acest element este operator dau push pe 
+stiva iar in cazul in care este operator verific daca este operator unar sau 
+binar.Prin urmare am 2 cazuri:
+-in cazul in care este operator unar scot un operator din stiva si calculez
+rezultatul(switch-ul de aici nu este necesar dar il folosesc pentru a evita un
+warning de castare foarte stupid, in acest moment eu sunt sigur ca operatorul 
+este unar deoarece am folosit metoda isUnaryOperator ca sa verific si as
+putea sa faca un cast la IUnaryOperator dar primesc un warning,pentru a evita
+acest warning am folosit un switch destul de inutil dar care ma scapa de 
+warning).
+-in cazul in care este operator binar procedez similar doar ca scot 2 elemente
+din stiva.
+La final intorc rezultatul sub forma unui operand.
+
+Metoda subscribe face parte din pattern-ul observer si face subscribe la 
+orice operator care este valid
+
+Metoda getResults intoarce lista cu rezultate ale calculelor.
+
+Aceasta clasa a fost cea mai importanta asa ca am explicat-o foarte pe larg.
+
+Clasa Token contine 2 metode getSymbol si setSymbol,prima returneaza simbolul
+in timp ce cea de-a doua seteaza simbolul.
+
+Clasa Bracket este asemanatoare cu Token,contine aceleasi metode doar ca in
+plus contine si un constructor.
+
+Clasa Operand contine aceleasi metode ca cele 2 clase de mai sus doar ca in
+plus mai contine getSymbolValue si setSymbolValue,prima intoarce valoarea
+number din string in timp ce a doua seteaza valoarea simbolului folosind
+un Number.
+
+Clasele DivideOperator, LogOperator, MinusOperator, MultiplyOperator,
+PlusOperator, PowOperator, SqrtOperator contin un constructor, metodele 
+pentru get/set la symbol dar si o metoda getPriority care intoarce prioritatea
+si o metoda calculate care calculeaza rezultatul efectiv al operatiei.
+
+Clasele OperandsFactory, BracketsFactory, OperatorsFactory sunt toate 
+Singleton si fac parte din Factory Pattern.
+
+Clasa OperandsFactory contine implementarea Singleton dar si metoda
+createOperand care reprezinta "fabrica" de operanzi.In plus mai contine
+metoda convertToRomanNumber care converteste un Number care reprezinta un
+numar arab intr-un String ce reprezinta un numar roman si metoda 
+convertToArabNumber care converteste un numar roman reprezentat de un String
+intr-un numar arab reprezentat de un number.
+
+Clasa OperatorsFactory contine implementarea Singleton dar si metoda 
+createOperator care reprezinta "fabrica" de operatori.In plus mai contine 
+metodele: isOperator care verifica daca este operator, isUnaryOperator
+care verifica daca este operator unar si isBinaryOperator care verifica
+daca este operator binar.
+
+Clasa BracketsFactory contine implementarea Singleton dar si metoda 
+createBracket care reprezinta "fabrica" de paranteze.In plus mai contine
+metodele isBracket care verifica daca este Bracket(paranteza),  
+isOpenedBracket care verifica daca este paranteza deschisa, isCloseBracket
+care verifica daca este paranteza inchisa si isBracketPair care verifica daca
+doua paranteze sunt o pereche.
+
+Pe scurt fluxul programului decurge astfel:Main apeleaza evaluatorul folosind
+o instanta a serverului.Evaluatorul face subscribe la orice operator care
+este valid dupa care face subscribe la calcul  si la final scrie rezultatele
+in fisier.
+
+Sper ca am explicat bine si imi cer scuze pentru greselile gramaticale daca
+exista.
+
+Observatii:
+-in fabricile pentru operatori si brackets nu creez decat o anumita clasa
+deoarece mi se pare "stupid" sa creez mai multe clase cand nu exista nici o
+diferenta inafara de symbol intre aceastea(in cazul bracket) sau este doar
+un singur tip(cazul operandului).
+-anumite secvente de cod exista doar pentru a evita warningurile de cast.
+
+Brinzan Ionut, 324CD
+
